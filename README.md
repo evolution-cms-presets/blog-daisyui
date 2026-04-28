@@ -54,11 +54,11 @@ Front theme controls are configured in `core/custom/config/presets/blog-daisyui.
 
 ```php
 'theme' => [
-    'enabled' => true,
-    'show_toggle' => true,
-    'show_picker' => true,
-    'default_light' => 'evolight',
-    'default_dark' => 'evodark',
+    'enabled' => true, // Enables frontend theme handling at all.
+    'show_toggle' => true, // Shows the sun/moon light-dark switch.
+    'show_themes' => true, // Shows the themes menu with the lists below.
+    'default_light' => 'evolight', // First light theme used by default and by the toggle.
+    'default_dark' => 'evodark', // First dark theme used by default and by the toggle.
     'light' => [
         'evolight' => 'EVO Light',
         'evolightness' => 'EVO Lightness',
@@ -71,6 +71,17 @@ Front theme controls are configured in `core/custom/config/presets/blog-daisyui.
 ```
 
 The default preset ships four custom frontend DaisyUI themes in `themes/blog-daisyui/css/themes.css`: `evolight`, `evolightness`, `evodark`, and `evodarkness`. To add your own custom theme, add a `[data-theme="my-theme"]` block to `themes.css`, then add it to the `light` or `dark` list in the config. Built-in DaisyUI themes can also be exposed by adding their names to the same lists; the full DaisyUI themes bundle is already loaded.
+
+By default the config exposes the full DaisyUI theme catalog plus the four custom EVO themes. To leave only the classic pair, keep just:
+
+```php
+'default_light' => 'light',
+'default_dark' => 'dark',
+'light' => ['light' => 'Light'],
+'dark' => ['dark' => 'Dark'],
+```
+
+You can also keep the full lists and change only `default_light` / `default_dark` to choose which light and dark theme the toggle uses first.
 
 ## Install Through Evo Installer
 
@@ -160,9 +171,9 @@ After install, the generated project `.gitignore` keeps Evolution core, manager,
 - Put frontend templates in `views/`.
 - Put theme assets in `themes/blog-daisyui/`.
 - DaisyUI and Tailwind browser assets are loaded in `views/layouts/base.blade.php`.
-- Configure available frontend themes, default light/dark themes, and picker visibility in `core/custom/config/presets/blog-daisyui.php`.
+- Configure available frontend themes, default light/dark themes, and themes menu visibility in `core/custom/config/presets/blog-daisyui.php`.
 - Put custom frontend DaisyUI theme tokens in `themes/blog-daisyui/css/themes.css`.
-- Light/dark switching and grouped DaisyUI theme picker persistence live in `themes/blog-daisyui/js/theme.js`.
+- Light/dark switching and grouped DaisyUI themes menu persistence live in `themes/blog-daisyui/js/theme.js`.
 - Keep the preset minimal; project-specific content belongs in the site repo that consumes it.
 - `HomeTemplateSeeder` assigns the default site template alias to `home`, so Evolution can resolve `views/home.blade.php`.
 

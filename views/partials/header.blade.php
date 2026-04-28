@@ -5,7 +5,7 @@
   $themeConfig = $themeConfig ?? [];
   $themeEnabled = (bool) ($themeConfig['enabled'] ?? true);
   $showThemeToggle = $themeEnabled && (bool) ($themeConfig['showToggle'] ?? true);
-  $showThemePicker = $themeEnabled && (bool) ($themeConfig['showPicker'] ?? true);
+  $showThemes = $themeEnabled && (bool) ($themeConfig['showThemes'] ?? true);
   $lightThemes = $themeConfig['light'] ?? [];
   $darkThemes = $themeConfig['dark'] ?? [];
 @endphp
@@ -120,7 +120,7 @@
         </label>
       @endif
 
-      @if($showThemePicker && (!empty($lightThemes) || !empty($darkThemes)))
+      @if($showThemes && (!empty($lightThemes) || !empty($darkThemes)))
         <div class="dropdown dropdown-end">
           <button tabindex="0" type="button" class="btn btn-ghost btn-sm gap-1 px-2 text-base-content/80 hover:text-base-content" aria-label="Choose DaisyUI theme">
             {!! svg('tabler-palette', 'h-6 w-6')->toHtml() !!}

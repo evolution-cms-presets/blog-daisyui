@@ -8,16 +8,19 @@ use Illuminate\Support\Facades\Cache;
 class BaseController
 {
     protected $evo;
+    protected array $themeSettings = [];
     public array $data = [];
 
     public function __construct()
     {
         $this->evo = EvolutionCMS();
+        $this->themeSettings = $this->themeSettings();
 
         ksort($_GET);
         $cacheId = sha1(json_encode([
             'doc' => (int) $this->evo->documentIdentifier,
             'get' => $_GET,
+            'theme' => $this->themeSettingsHash(),
         ]));
 
         if ($this->evo->getConfig('enable_cache')) {
@@ -55,7 +58,7 @@ class BaseController
 
     protected function themeConfig(): array
     {
-        $config = config('presets.blog-daisyui.theme', config('blog-daisyui.theme', []));
+        $config = $this->themeSettings;
 
         $light = $this->themeGroup($config['light'] ?? []);
         $dark = $this->themeGroup($config['dark'] ?? []);
@@ -66,7 +69,7 @@ class BaseController
         return [
             'enabled' => (bool) ($config['enabled'] ?? true),
             'showToggle' => (bool) ($config['show_toggle'] ?? true),
-            'showPicker' => (bool) ($config['show_picker'] ?? true),
+            'showThemes' => (bool) ($config['show_themes'] ?? true),
             'defaultLight' => $defaultLight,
             'defaultDark' => $defaultDark,
             'storageKey' => trim((string) ($config['storage_key'] ?? 'evo.blogDaisyui.theme')),
@@ -110,6 +113,20 @@ class BaseController
         }
 
         return $names[0] ?? $fallback;
+    }
+
+    protected function themeSettings(): array
+    {
+        $config = config('presets.blog-daisyui.theme', config('blog-daisyui.theme', []));
+
+        return is_array($config) ? $config : [];
+    }
+
+    protected function themeSettingsHash(): string
+    {
+        $payload = json_encode($this->themeSettings, JSON_UNESCAPED_SLASHES);
+
+        return sha1($payload !== false ? $payload : serialize($this->themeSettings));
     }
 
     protected function menuTree(): array
