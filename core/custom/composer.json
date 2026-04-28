@@ -4,7 +4,8 @@
   "type": "project",
   "license": "MIT",
   "require": {
-    "evolution-cms/etinymce": "*"
+    "evolution-cms/etinymce": "*",
+    "seiger/sseo": "*"
   },
   "autoload": {
     "psr-4": {
