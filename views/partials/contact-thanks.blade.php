@@ -8,5 +8,5 @@
     <span>{{ $mailSent ? 'Message sent.' : 'Message was logged, but mail delivery needs configuration.' }}</span>
   </div>
 
-  <a class="btn btn-ghost btn-sm" href="{{ $contactUrl }}#contact-form">Send another message</a>
+  <a class="btn btn-ghost btn-sm" href="{{ $contactUrl }}#contact-form" data-contact-reset>Send another message</a>
 </div>

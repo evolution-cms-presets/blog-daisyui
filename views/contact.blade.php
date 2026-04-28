@@ -32,6 +32,20 @@
     (function () {
       var container = document.getElementById('contactFormFrame');
       if (!container) return;
+      var initialFormHtml = container.innerHTML;
+
+      container.addEventListener('click', function (event) {
+        var reset = event.target.closest('[data-contact-reset]');
+        if (!reset) return;
+
+        event.preventDefault();
+        container.innerHTML = initialFormHtml;
+
+        var firstField = container.querySelector('input[name="name"]');
+        if (firstField) {
+          firstField.focus();
+        }
+      });
 
       container.addEventListener('submit', function (event) {
         var form = event.target.closest('[data-contact-form]');
