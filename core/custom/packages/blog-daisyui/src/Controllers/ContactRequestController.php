@@ -3,6 +3,7 @@
 namespace EvolutionCMS\BlogDaisyui\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -11,6 +12,10 @@ class ContactRequestController
     public function submit(Request $request)
     {
         if (trim((string) $request->input('company_url', '')) !== '') {
+            if ($this->wantsJson($request)) {
+                return $this->successResponse($request, true);
+            }
+
             return redirect()->to($this->redirectUrl($request, 'sent'));
         }
 
@@ -19,10 +24,36 @@ class ContactRequestController
             'name' => ['required', 'string', 'min:2', 'max:120'],
             'email' => ['required', 'email:rfc', 'max:180'],
             'message' => ['required', 'string', 'min:10', 'max:4000'],
+        ], [
+            'name.required' => 'Tell us your name so we know who to reply to.',
+            'name.min' => 'Use at least 2 characters for your name.',
+            'email.required' => 'Add an email address so we can reply.',
+            'email.email' => 'Use a valid email address.',
+            'message.required' => 'Tell us a little about your request.',
+            'message.min' => 'Add a few more details so the message is useful.',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->to($this->redirectUrl($request, 'invalid'));
+            if ($this->wantsJson($request)) {
+                return Response::json([
+                    'ok' => false,
+                    'output' => view('partials.contact-form', [
+                        'contact' => [
+                            'action' => $this->endpoint(),
+                            'pageUrl' => $this->baseRedirectUrl($request),
+                            'status' => 'invalid',
+                        ],
+                        'old' => $input,
+                        'fieldErrors' => $validator->errors()->toArray(),
+                    ])->render(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            return redirect()
+                ->to($this->redirectUrl($request, 'invalid'))
+                ->withErrors($validator)
+                ->withInput();
         }
 
         EvolutionCMS()->logEvent(
@@ -43,7 +74,13 @@ class ContactRequestController
             );
         }
 
-        return redirect()->to($this->redirectUrl($request, $mailSent ? 'sent' : 'logged'));
+        if ($this->wantsJson($request)) {
+            return $this->successResponse($request, $mailSent);
+        }
+
+        return redirect()
+            ->to($this->redirectUrl($request, $mailSent ? 'sent' : 'logged'))
+            ->with('contact_name', $input['name']);
     }
 
     private function cleanInput(Request $request): array
@@ -84,6 +121,17 @@ class ContactRequestController
         }
     }
 
+    private function successResponse(Request $request, bool $mailSent)
+    {
+        return Response::json([
+            'ok' => true,
+            'output' => view('partials.contact-thanks', [
+                'mailSent' => $mailSent,
+                'contactUrl' => $this->baseRedirectUrl($request),
+            ])->render(),
+        ]);
+    }
+
     private function formatEventLogMessage(array $input, Request $request): string
     {
         return '<pre>' . htmlspecialchars(
@@ -115,6 +163,17 @@ class ContactRequestController
 
     private function redirectUrl(Request $request, string $status): string
     {
+        $target = $this->baseRedirectUrl($request);
+        $parts = parse_url($target) ?: [];
+        $path = (string) ($parts['path'] ?? '/');
+        parse_str((string) ($parts['query'] ?? ''), $query);
+        $query['contact'] = $status;
+
+        return $path . '?' . http_build_query($query) . '#contact-form';
+    }
+
+    private function baseRedirectUrl(Request $request): string
+    {
         $target = trim((string) $request->input('redirect_to', '/'));
 
         if ($target === '' || $target[0] !== '/' || str_starts_with($target, '//')) {
@@ -125,8 +184,22 @@ class ContactRequestController
         $parts = parse_url($target) ?: [];
         $path = (string) ($parts['path'] ?? '/');
         parse_str((string) ($parts['query'] ?? ''), $query);
-        $query['contact'] = $status;
+        unset($query['contact']);
 
-        return $path . '?' . http_build_query($query) . '#contact-form';
+        $queryString = http_build_query($query);
+
+        return $path . ($queryString !== '' ? '?' . $queryString : '');
+    }
+
+    private function endpoint(): string
+    {
+        return rtrim((string) EvolutionCMS()->getConfig('site_url'), '/') . '/contact-submit';
+    }
+
+    private function wantsJson(Request $request): bool
+    {
+        return $request->ajax()
+            || $request->expectsJson()
+            || str_contains((string) $request->header('Accept'), 'application/json');
     }
 }

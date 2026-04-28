@@ -11,48 +11,79 @@
     @endif
 
     <section id="contact-form" class="rounded-lg border border-base-300 bg-base-100 p-5 shadow-sm" aria-label="Contact form">
-      @if(($contact['status'] ?? '') === 'sent')
-        <div class="alert alert-success mb-5">
-          <span>Message sent.</span>
-        </div>
-      @elseif(($contact['status'] ?? '') === 'logged')
-        <div class="alert alert-warning mb-5">
-          <span>Message was logged, but mail delivery needs configuration.</span>
-        </div>
-      @elseif(($contact['status'] ?? '') === 'invalid')
-        <div class="alert alert-error mb-5">
-          <span>Check the form fields and try again.</span>
-        </div>
-      @endif
-
-      <form class="space-y-5" action="{{ $contact['action'] ?? '/contact-submit' }}" method="post">
-        <input type="hidden" name="redirect_to" value="{{ request()->getRequestUri() }}">
-        <div class="hidden" aria-hidden="true">
-          <label>
-            Website
-            <input type="text" name="company_url" tabindex="-1" autocomplete="off">
-          </label>
-        </div>
-
-        <label class="form-control w-full">
-          <span class="label-text mb-2">Name</span>
-          <input class="input input-bordered w-full" type="text" name="name" autocomplete="name" required>
-        </label>
-
-        <label class="form-control w-full">
-          <span class="label-text mb-2">Email</span>
-          <input class="input input-bordered w-full" type="email" name="email" autocomplete="email" required>
-        </label>
-
-        <label class="form-control w-full">
-          <span class="label-text mb-2">Message</span>
-          <textarea class="textarea textarea-bordered min-h-36 w-full" name="message" required></textarea>
-        </label>
-
-        <div class="pt-1">
-          <button class="btn btn-primary w-full sm:w-auto" type="submit">Send message</button>
-        </div>
-      </form>
+      <div id="contactFormFrame">
+        @if(in_array(($contact['status'] ?? ''), ['sent', 'logged'], true))
+          @include('partials.contact-thanks', [
+            'mailSent' => ($contact['status'] ?? '') === 'sent',
+            'contactUrl' => $contact['pageUrl'] ?? request()->getRequestUri(),
+          ])
+        @else
+          @include('partials.contact-form', [
+            'contact' => $contact ?? [],
+            'old' => [],
+            'fieldErrors' => [],
+          ])
+        @endif
+      </div>
     </section>
   </div>
+
+  <script>
+    (function () {
+      var container = document.getElementById('contactFormFrame');
+      if (!container) return;
+
+      container.addEventListener('submit', function (event) {
+        var form = event.target.closest('[data-contact-form]');
+        if (!form) return;
+
+        event.preventDefault();
+
+        var submitButton = form.querySelector('[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.classList.add('btn-disabled');
+        }
+
+        fetch(form.getAttribute('action'), {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: new FormData(form)
+        })
+          .then(function (response) {
+            return response.json().then(function (payload) {
+              return {
+                ok: response.ok,
+                payload: payload
+              };
+            });
+          })
+          .then(function (result) {
+            if (result.payload && result.payload.output) {
+              container.innerHTML = result.payload.output;
+            }
+
+            if (!result.ok) {
+              var firstInvalid = container.querySelector('[aria-invalid="true"]');
+              if (firstInvalid) {
+                firstInvalid.focus();
+              }
+            }
+          })
+          .catch(function () {
+            container.insertAdjacentHTML('afterbegin', '<div class="alert alert-error mb-4">The request could not be sent. Please try again.</div>');
+          })
+          .finally(function () {
+            var freshButton = container.querySelector('[type="submit"]');
+            if (freshButton) {
+              freshButton.disabled = false;
+              freshButton.classList.remove('btn-disabled');
+            }
+          });
+      });
+    })();
+  </script>
 @endsection

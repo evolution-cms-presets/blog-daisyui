@@ -10,6 +10,7 @@ class ContactController extends BaseController
 
         $this->data['contact'] = [
             'action' => $this->absoluteUrl('/contact-submit'),
+            'pageUrl' => request()->getRequestUri(),
             'status' => in_array($status, ['sent', 'logged', 'invalid'], true) ? $status : '',
         ];
     }
