@@ -3,6 +3,7 @@
 namespace EvolutionCMS\BlogDaisyui\Controllers;
 
 use EvolutionCMS\Models\SiteContent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 
 class BaseController
@@ -139,6 +140,117 @@ class BaseController
             ->unique('id')
             ->toTree()
             ->toArray();
+    }
+
+    protected function currentDocument(): ?SiteContent
+    {
+        $id = (int) $this->evo->documentIdentifier;
+
+        return $id > 0 ? SiteContent::query()->find($id) : null;
+    }
+
+    protected function blogRoot(): ?SiteContent
+    {
+        return SiteContent::query()
+            ->where('parent', 0)
+            ->where('alias', 'blog')
+            ->where('deleted', 0)
+            ->first();
+    }
+
+    protected function blogPostsQuery(?int $parentId = null): Builder
+    {
+        $query = SiteContent::query()
+            ->where('deleted', 0)
+            ->where('published', 1)
+            ->where('isfolder', 0);
+
+        if ($parentId) {
+            $query->where('parent', $parentId);
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        return $query
+            ->orderByRaw('CASE WHEN pub_date > 0 THEN pub_date WHEN publishedon > 0 THEN publishedon ELSE createdon END DESC')
+            ->orderByDesc('id');
+    }
+
+    protected function latestPosts(int $limit = 3): array
+    {
+        $blog = $this->blogRoot();
+
+        if (!$blog) {
+            return [];
+        }
+
+        return $this->blogPostsQuery((int) $blog->id)
+            ->limit($limit)
+            ->get()
+            ->map(fn (SiteContent $post) => $this->mapPost($post))
+            ->all();
+    }
+
+    protected function mapPost(SiteContent $post): array
+    {
+        return [
+            'id' => (int) $post->id,
+            'title' => (string) $post->pagetitle,
+            'longtitle' => (string) ($post->longtitle ?: $post->pagetitle),
+            'summary' => $this->documentSummary($post),
+            'date' => $this->formatDate($this->documentTimestamp($post)),
+            'url' => $this->evo->makeUrl((int) $post->id),
+        ];
+    }
+
+    protected function documentSummary(SiteContent $document, int $limit = 180): string
+    {
+        $summary = trim((string) ($document->introtext ?: $document->description));
+
+        if ($summary === '') {
+            $summary = trim(preg_replace('/\s+/', ' ', strip_tags((string) $document->content)) ?? '');
+        }
+
+        if (mb_strlen($summary) <= $limit) {
+            return $summary;
+        }
+
+        return rtrim(mb_substr($summary, 0, $limit - 1)) . '...';
+    }
+
+    protected function documentTimestamp(SiteContent $document): int
+    {
+        foreach (['pub_date', 'publishedon', 'createdon', 'editedon'] as $field) {
+            $timestamp = (int) $document->{$field};
+
+            if ($timestamp > 0) {
+                return $timestamp;
+            }
+        }
+
+        return 0;
+    }
+
+    protected function formatDate(int $timestamp): string
+    {
+        return $timestamp > 0 ? date('M j, Y', $timestamp) : '';
+    }
+
+    protected function pageUrl(int $documentId, int $page = 1): string
+    {
+        return $this->evo->makeUrl($documentId, '', $page > 1 ? http_build_query(['page' => $page]) : '');
+    }
+
+    protected function absoluteUrl(string $url): string
+    {
+        if (preg_match('~^https?://~i', $url)) {
+            return $url;
+        }
+
+        $siteUrl = rtrim((string) $this->evo->getConfig('site_url'), '/');
+        $path = $url !== '' && $url[0] === '/' ? $url : '/' . ltrim($url, '/');
+
+        return $siteUrl . $path;
     }
 
     public function sendToView(): void

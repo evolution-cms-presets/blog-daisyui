@@ -10,6 +10,11 @@ class BlogDaisyuiServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $routes = __DIR__ . '/Http/routes.php';
+        if (is_file($routes)) {
+            include $routes;
+        }
+
         $this->loadViewsFrom(dirname(__DIR__) . '/views', 'blog-daisyui');
     }
 
