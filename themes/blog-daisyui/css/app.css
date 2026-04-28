@@ -1,0 +1,63 @@
+.content-flow {
+  max-width: 720px;
+}
+
+.content-flow h1 {
+  margin: 0 0 16px;
+  color: currentColor;
+  font-size: 40px;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.content-flow h2 {
+  margin: 32px 0 12px;
+  color: currentColor;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.content-flow p,
+.content-flow li {
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.content-flow p,
+.content-flow ul,
+.content-flow ol {
+  margin: 0 0 16px;
+}
+
+.content-flow a {
+  color: color-mix(in srgb, currentColor 78%, #2563eb);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.content-flow code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: currentColor;
+  font-size: 0.9em;
+}
+
+.content-flow :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 680px) {
+  .content-flow h1 {
+    font-size: 32px;
+  }
+
+  .content-flow h2 {
+    font-size: 24px;
+  }
+}

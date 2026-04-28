@@ -1,0 +1,13 @@
+{
+  "name": "evolution-cms-presets/blog-daisyui",
+  "description": "Blog DaisyUI Evolution CMS preset package.",
+  "type": "library",
+  "license": "MIT",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "EvolutionCMS\\BlogDaisyui\\BlogDaisyuiServiceProvider"
+      ]
+    }
+  }
+}

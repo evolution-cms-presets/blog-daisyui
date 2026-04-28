@@ -1,0 +1,11 @@
+{
+  "name": "evolution-cms-presets/blog-daisyui-project-layer",
+  "description": "Blog DaisyUI project layer for Evolution CMS preset installs.",
+  "type": "project",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "EvolutionCMS\\BlogDaisyui\\": "packages/blog-daisyui/src/"
+    }
+  }
+}

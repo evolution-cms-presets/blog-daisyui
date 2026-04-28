@@ -1,0 +1,45 @@
+# Evo core and manager are installed separately and are not part of this project layer.
+/core/*
+!/core/custom/
+!/core/custom/**
+/manager/
+/install/
+
+# Root files produced by the Evo installer.
+/index.php
+/.htaccess
+/composer.json
+/composer.lock
+/vendor/
+/composer.phar
+/phpstan.neon
+
+# Runtime files.
+/assets/*
+!/assets/site/
+!/assets/site/**
+/assets/site/.htaccess
+/assets/site/index.html
+/core/custom/cache/
+/core/custom/storage/
+/core/custom/logs/
+/core/custom/config/app/providers/
+/core/custom/config/app/aliases/
+
+# Local databases and secrets.
+*.sqlite
+*.sqlite3
+/database.sqlite
+.env
+/core/custom/.env
+
+# Local tooling.
+/node_modules/
+npm-debug.log
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
