@@ -132,7 +132,7 @@ class BaseController
 
     protected function menuTree(): array
     {
-        return SiteContent::GetRootTree(2)
+        $tree = SiteContent::GetRootTree(2)
             ->where('site_content.hidemenu', 0)
             ->orderBy('t2.menuindex')
             ->orderBy('t2.id')
@@ -140,6 +140,30 @@ class BaseController
             ->unique('id')
             ->toTree()
             ->toArray();
+
+        return $this->visibleMenuItems($tree);
+    }
+
+    protected function visibleMenuItems(array $items): array
+    {
+        $visible = [];
+
+        foreach ($items as $item) {
+            if ((bool) ($item['hidemenu'] ?? false)) {
+                continue;
+            }
+
+            $children = $this->visibleMenuItems($item['children'] ?? []);
+            if ($children === []) {
+                unset($item['children']);
+            } else {
+                $item['children'] = $children;
+            }
+
+            $visible[] = $item;
+        }
+
+        return $visible;
     }
 
     protected function currentDocument(): ?SiteContent
