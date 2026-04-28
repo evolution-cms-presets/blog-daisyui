@@ -106,12 +106,14 @@
     <script defer src="/themes/{{ env('EVO_PRESET_NAME', 'blog-daisyui') }}/js/theme.js"></script>
   </head>
   <body class="min-h-screen bg-base-200 text-base-content antialiased">
-    <div class="grid min-h-screen grid-rows-[auto_1fr]">
+    <div class="grid min-h-screen grid-rows-[auto_1fr_auto]">
       @include('partials.header')
 
       <main class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         @yield('content')
       </main>
+
+      @include('partials.footer')
     </div>
   </body>
 </html>

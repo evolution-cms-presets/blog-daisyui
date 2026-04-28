@@ -25,7 +25,7 @@
         </div>
       @endif
 
-      <form class="space-y-4" action="{{ $contact['action'] ?? '/contact-submit' }}" method="post">
+      <form class="space-y-5" action="{{ $contact['action'] ?? '/contact-submit' }}" method="post">
         <input type="hidden" name="redirect_to" value="{{ request()->getRequestUri() }}">
         <div class="hidden" aria-hidden="true">
           <label>
@@ -49,7 +49,9 @@
           <textarea class="textarea textarea-bordered min-h-36 w-full" name="message" required></textarea>
         </label>
 
-        <button class="btn btn-primary w-full sm:w-auto" type="submit">Send message</button>
+        <div class="pt-1">
+          <button class="btn btn-primary w-full sm:w-auto" type="submit">Send message</button>
+        </div>
       </form>
     </section>
   </div>
