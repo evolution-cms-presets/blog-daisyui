@@ -16,7 +16,7 @@
             {{ evo()->getConfig('site_name') ?: 'Evolution CMS' }}
           </h1>
           <p class="max-w-2xl text-lg leading-8 text-base-content/70">
-            A compact blog starter with DaisyUI components, theme switching, rich text editing, and SEO tools ready after install.
+            A compact blog starter with DaisyUI components, theme switching, and rich text editing ready after install.
           </p>
         </div>
 
@@ -29,8 +29,8 @@
           </div>
           <div class="card border border-base-300 bg-base-100">
             <div class="card-body p-5">
-              <h2 class="card-title text-base">SEO Ready</h2>
-              <p class="text-sm text-base-content/70">sSeo is installed as a locked preset dependency for blog metadata.</p>
+              <h2 class="card-title text-base">Clean Baseline</h2>
+              <p class="text-sm text-base-content/70">SEO tooling can be added when the project is ready for its metadata workflow.</p>
             </div>
           </div>
           <div class="card border border-base-300 bg-base-100">

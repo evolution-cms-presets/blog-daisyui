@@ -1,6 +1,6 @@
 # Evolution CMS Blog DaisyUI Preset
 
-Minimal blog-oriented DaisyUI project-layer preset for Evolution CMS 3.5.x. It starts from the default DaisyUI layout and declares required blog editing/SEO Extras for the installer.
+Minimal blog-oriented DaisyUI project-layer preset for Evolution CMS 3.5.x. It starts from the default DaisyUI layout and declares the required blog editing Extra for the installer.
 
 ## What This Preset Contains
 
@@ -39,12 +39,14 @@ This preset declares required Extras in `core/custom/preset.json`:
 {
   "name": "blog-daisyui",
   "extras": {
-    "required": ["eTinyMCE", "sSeo"]
+    "required": ["eTinyMCE"]
   }
 }
 ```
 
-Installer versions that support preset-required Extras will install `eTinyMCE` and `sSeo` automatically. In TUI mode they are selected and locked; optional Extras can still be added or skipped.
+Installer versions that support preset-required Extras will install `eTinyMCE` automatically. In TUI mode it is selected and locked; optional Extras can still be added or skipped.
+
+Additional SEO tooling can be added after the upstream local-redirect fix is released.
 
 ## Install Through Evo Installer
 

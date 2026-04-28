@@ -2,8 +2,7 @@
   "name": "blog-daisyui",
   "extras": {
     "required": [
-      "eTinyMCE",
-      "sSeo"
+      "eTinyMCE"
     ]
   }
 }
