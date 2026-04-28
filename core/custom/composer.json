@@ -3,6 +3,9 @@
   "description": "Blog DaisyUI project layer for Evolution CMS preset installs.",
   "type": "project",
   "license": "MIT",
+  "require": {
+    "evolution-cms/etinymce": "*"
+  },
   "autoload": {
     "psr-4": {
       "EvolutionCMS\\BlogDaisyui\\": "packages/blog-daisyui/src/"

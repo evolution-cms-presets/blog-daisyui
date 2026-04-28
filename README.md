@@ -8,9 +8,9 @@ Minimal blog-oriented DaisyUI project-layer preset for Evolution CMS 3.5.x. It s
 core/custom/
   .gitignore
   composer.json
-  preset.json
   config/
     cms/settings/ControllerNamespace.php
+    presets/blog-daisyui.php
   packages/blog-daisyui/src/
     composer.json
     BlogDaisyuiServiceProvider.php
@@ -25,6 +25,7 @@ views/
   partials/header.blade.php
 themes/blog-daisyui/
   css/app.css
+  css/themes.css
   js/theme.js
 .gitignore
 ```
@@ -33,20 +34,43 @@ Evolution core, manager files, runtime cache, database files, and local secrets 
 
 ## Required Extras
 
-This preset declares required Extras in `core/custom/preset.json`:
+This preset declares required Composer Extras in `core/custom/composer.json`:
 
 ```json
 {
-  "name": "blog-daisyui",
-  "extras": {
-    "required": ["eTinyMCE"]
+  "require": {
+    "evolution-cms/etinymce": "*"
   }
 }
 ```
 
-Installer versions that support preset-required Extras will install `eTinyMCE` automatically. In TUI mode it is selected and locked; optional Extras can still be added or skipped.
+Installer versions that support Composer-backed preset Extras will install `eTinyMCE` automatically and still run the Extras install flow so assets, provider config, migrations, and cache clearing are handled. In TUI mode it is selected and locked; optional Extras can still be added or skipped.
 
 Additional SEO tooling can be added after the upstream local-redirect fix is released.
+
+## Theme Configuration
+
+Front theme controls are configured in `core/custom/config/presets/blog-daisyui.php`. The file is copied into `core/custom/config` with the preset, matching the same custom-config convention used by installable Extras such as `core/custom/config/seiger/settings/sGallery.php` and `core/custom/config/seiger/settings/sCommerce.php`.
+
+```php
+'theme' => [
+    'enabled' => true,
+    'show_toggle' => true,
+    'show_picker' => true,
+    'default_light' => 'evolight',
+    'default_dark' => 'evodark',
+    'light' => [
+        'evolight' => 'EVO Light',
+        'evolightness' => 'EVO Lightness',
+    ],
+    'dark' => [
+        'evodark' => 'EVO Dark',
+        'evodarkness' => 'EVO Darkness',
+    ],
+],
+```
+
+The default preset ships four custom frontend DaisyUI themes in `themes/blog-daisyui/css/themes.css`: `evolight`, `evolightness`, `evodark`, and `evodarkness`. To add your own custom theme, add a `[data-theme="my-theme"]` block to `themes.css`, then add it to the `light` or `dark` list in the config. Built-in DaisyUI themes can also be exposed by adding their names to the same lists; the full DaisyUI themes bundle is already loaded.
 
 ## Install Through Evo Installer
 
@@ -132,10 +156,12 @@ After install, the generated project `.gitignore` keeps Evolution core, manager,
 ## Development Contract
 
 - Put PHP site logic in `core/custom/packages/blog-daisyui/src/`.
-- Put preset installer metadata in `core/custom/preset.json`.
+- Put required Composer package dependencies in `core/custom/composer.json`.
 - Put frontend templates in `views/`.
 - Put theme assets in `themes/blog-daisyui/`.
 - DaisyUI and Tailwind browser assets are loaded in `views/layouts/base.blade.php`.
+- Configure available frontend themes, default light/dark themes, and picker visibility in `core/custom/config/presets/blog-daisyui.php`.
+- Put custom frontend DaisyUI theme tokens in `themes/blog-daisyui/css/themes.css`.
 - Light/dark switching and grouped DaisyUI theme picker persistence live in `themes/blog-daisyui/js/theme.js`.
 - Keep the preset minimal; project-specific content belongs in the site repo that consumes it.
 - `HomeTemplateSeeder` assigns the default site template alias to `home`, so Evolution can resolve `views/home.blade.php`.
